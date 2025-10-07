@@ -2,10 +2,12 @@ import express from "express";
 import { createHandler } from "graphql-http/lib/use/express";
 import { ruruHTML } from "ruru/server";
 import { buildSchema } from "graphql";
+import fs from "fs";
 
-const schema = buildSchema(`type Query { hello: String } `);
+const schemaString = fs.readFileSync("schema.graphql", "utf8");
+const schema = buildSchema(schemaString);
 
-const root = {
+const resolvers = {
   hello() {
     return "Hello world!";
   },
@@ -13,7 +15,7 @@ const root = {
 
 const app = express();
 
-app.all("/graphql", createHandler({ schema, rootValue: root }));
+app.all("/graphql", createHandler({ schema, rootValue: resolvers }));
 
 app.get("/", (req, res) => {
   res.type("html");
